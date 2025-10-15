@@ -1,8 +1,33 @@
+# coding=utf-8
+# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) HuggingFace Inc. team.
+# Copyright (c) Jonas Geiger/Johannes Kepler University.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Multimodal classification for MM-IMDB and Music4All datasets.
+
+This file is based on the HuggingFace mm-imdb example (run_mmimdb.py):
+https://huggingface.co/spaces/xmadai/1bit_llama3_instruct_xmad_qa_batch/blob/main/examples/research_projects/mm-imdb/utils_mmimdb.py
+
+Modified by Jonas Geiger, 2025
+"""
+
+import logging
+import math
 import argparse
 import glob
 import json
-import logging
-import math
 import os
 import random
 from collections import defaultdict, Counter
@@ -51,11 +76,7 @@ from transformers import (
 from transformers.trainer_utils import is_main_process
 from datetime import datetime
 
-
-try:
-    from torch.utils.tensorboard import SummaryWriter
-except ImportError:
-    from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -64,15 +85,14 @@ logger = logging.getLogger(__name__)
 
 
 def set_seed(args):
-    random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
+    random.seed(args.seed)
     if args.n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
 
 
 def train(args, train_dataset, model, tokenizer):
-    """Train the model"""
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
 
@@ -833,22 +853,22 @@ def main():
     parser.add_argument("--tokenizer_name", default="", type=str)
     parser.add_argument("--cache_dir", default=None, type=str)
     parser.add_argument("--max_seq_length", default=128, type=int)
-    parser.add_argument("--num_image_embeds", default=1, type=int)
+    parser.add_argument("--num_image_embeds", default=3, type=int)
     parser.add_argument("--do_train", action="store_true")
     parser.add_argument("--do_eval", action="store_true")
     parser.add_argument("--evaluate_during_training", action="store_true")
     parser.add_argument("--do_lower_case", action="store_true")
-    parser.add_argument("--per_gpu_train_batch_size", default=8, type=int)  # 8
-    parser.add_argument("--per_gpu_eval_batch_size", default=8, type=int)  # 8
-    parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
-    parser.add_argument("--learning_rate", default=5e-5, type=float)
-    parser.add_argument("--weight_decay", default=0.00, type=float)  # 0.00
+    parser.add_argument("--per_gpu_train_batch_size", default=16, type=int)
+    parser.add_argument("--per_gpu_eval_batch_size", default=32, type=int)
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=20)
+    parser.add_argument("--learning_rate", default=5e-4, type=float)
+    parser.add_argument("--weight_decay", default=0.00001, type=float)
     parser.add_argument("--adam_epsilon", default=1e-8, type=float)
     parser.add_argument("--max_grad_norm", default=1.0, type=float)
-    parser.add_argument("--num_train_epochs", default=3.0, type=float)
-    parser.add_argument("--patience", default=5, type=int)
+    parser.add_argument("--num_train_epochs", default=90, type=float)
+    parser.add_argument("--patience", default=0, type=int)
     parser.add_argument("--max_steps", default=-1, type=int)
-    parser.add_argument("--warmup_steps", default=3, type=int)  # 0
+    parser.add_argument("--warmup_steps", default=50, type=int)
     parser.add_argument("--logging_steps", type=int, default=50)
     parser.add_argument("--save_steps", type=int, default=50)
     parser.add_argument("--eval_all_checkpoints", action="store_true")
