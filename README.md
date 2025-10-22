@@ -13,10 +13,10 @@ Each entry includes metadata, genre annotations, visual representations (artist 
 ## Features
 
 - Multi-label genre classification support
-- Stratified train/test splits (80/20)
+- Stratified train/test splits (80/20
 - Missing modality evaluation scenarios (10%, 30%, 50%, 70%, 90%)
 
 
 ## Dataset
 
-The Dataset can be downloaded from: [https://zenodo.org/records/17215484](https://zenodo.org/records/17278677)
+The Dataset can be downloaded from: [https://zenodo.org/records/17400116](https://zenodo.org/records/17400116)
